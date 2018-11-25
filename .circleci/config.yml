@@ -3,9 +3,6 @@ jobs:
   build:
     docker: # use the docker executor type; machine and macos executors are also supported
       - image: ecr-sample-repo:1.0 # the primary container, where your job's commands are run
-        aws_auth:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
     steps:
       - checkout # check out the code in the project directory
       - run:
