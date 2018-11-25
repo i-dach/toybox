@@ -2,12 +2,12 @@ version: 2
 jobs:
   build:
     docker: # use the docker executor type; machine and macos executors are also supported
-#      - image: circleci/golang:1.8 # the primary container, where your job's commands are run
+      - image: circleci/golang:1.8 # the primary container, where your job's commands are run
     steps:
       - checkout # check out the code in the project directory
-      # - run:
-      #     name: test echo
-      #     command: echo "hello world" # run the `echo` command
+      - run:
+          name: test echo
+          command: echo "hello world" # run the `echo` command
       - setup_remote_docker
       - run:
           name: docker image build
