@@ -10,6 +10,9 @@ jobs:
           command: echo "hello world" # run the `echo` command
       - setup_remote_docker
       - run:
+          name: ecr login
+          command: eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - run:
           name: docker image build
           command: docker build -t ecr-sample-repo docker_test/hello/.
       - run:
