@@ -12,8 +12,8 @@ jobs:
       - run:
           name: ecr login
           command: |
-          . venv/bin/activate
-          eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            . venv/bin/activate
+            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - run:
           name: docker image build
           command: docker build -t ecr-sample-repo docker_test/hello/.
