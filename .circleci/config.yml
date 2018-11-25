@@ -10,15 +10,12 @@ jobs:
           command: echo $AWS_DEFAULT_REGION # run the `echo` command
       - setup_remote_docker
       - run:
-          name: Install the AWS CLI
+          name: Install the AWS CLI & ecr login
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            eval $(pip install awscli)
-            aws --version
-      - run:
-          name: ecr login
-          command: eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            pip install awscli
+            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - run:
           name: docker image build
           command: docker build -t ecr-sample-repo docker_test/hello/.
