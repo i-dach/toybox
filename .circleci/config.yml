@@ -10,7 +10,7 @@ jobs:
           command: echo $AWS_DEFAULT_REGION # run the `echo` command
       - setup_remote_docker
       - run:
-          name: Install the AWS CLI & ecr login
+          name: Install the AWS CLI and ecr login
           command: |
             python3 -m venv venv
             . venv/bin/activate
