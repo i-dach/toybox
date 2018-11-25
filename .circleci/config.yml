@@ -14,7 +14,8 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install awscli
+            pip install -r awscli
+            aws --version
       - run:
           name: ecr login
           command: eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
