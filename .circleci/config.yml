@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker: # use the docker executor type; machine and macos executors are also supported
-      - image: circleci/golang:1.8 # the primary container, where your job's commands are run
+      - image: circleci/python # the primary container, where your job's commands are run
     steps:
       - checkout # check out the code in the project directory
       - run:
@@ -10,16 +10,20 @@ jobs:
           command: echo $AWS_DEFAULT_REGION # run the `echo` command
       - setup_remote_docker
       - run:
-          name: ecr login
+          name: Install the AWS CLI
           command: |
+            python3 -m venv venv
             . venv/bin/activate
-            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            pip install -r requirements.txt
+      - run:
+          name: ecr login
+          command: eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - run:
           name: docker image build
           command: docker build -t ecr-sample-repo docker_test/hello/.
       - run:
           name: docker image commit
-          command: docker tag ecr-sample-repo 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest
+          command: docker tag local:ecr-sample-repo 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest
       - run:
           name: docker push
           command: docker push 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest      
