@@ -23,7 +23,7 @@ jobs:
           command: docker build -t ecr-sample-repo docker_test/hello/.
       - run:
           name: docker image commit
-          command: docker tag local:ecr-sample-repo 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest
+          command: docker tag ecr-sample-repo 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest
       - run:
           name: docker push
           command: docker push 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest      
