@@ -7,7 +7,9 @@ jobs:
       - checkout # check out the code in the project directory
       - run:
           name: test echo
-          command: echo $AWS_DEFAULT_REGION # run the `echo` command
+          command: |
+            echo 'export ECR_REPOSITORY_NAME="${AWS_RESOURCE_NAME_PREFIX}"' >> $BASH_ENV
+            echo 'export FULL_IMAGE_NAME="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"' >> $BASH_ENV
       - setup_remote_docker
       - run:
           name: Install the AWS CLI and ecr login
@@ -18,10 +20,14 @@ jobs:
             eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - run:
           name: docker image build
-          command: docker build -t ecr-sample-repo docker_test/hello/.
+          command: docker build -t $ECR_REPOSITORY_NAME .
       - run:
           name: docker image commit
-          command: docker tag ecr-sample-repo 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest
+          command: |
+            docker tag $ECR_REPOSITORY_NAME $FULL_IMAGE_NAME:latest
+            docker tag $ECR_REPOSITORY_NAME $FULL_IMAGE_NAME:$CIRCLE_SHA1
       - run:
           name: docker push
-          command: docker push 224596871366.dkr.ecr.us-west-2.amazonaws.com/ecr-sample-repo:latest      
+          command: |
+            docker push $FULL_IMAGE_NAME:latest
+            docker push $FULL_IMAGE_NAME:$CIRCLE_SHA1
