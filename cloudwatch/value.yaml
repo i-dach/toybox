@@ -1,0 +1,6 @@
+awsRegion: us-west-2
+rbac:
+  create: true
+extraVars:
+  - "{ name: FLUENT_UID, value: '0' }"
+

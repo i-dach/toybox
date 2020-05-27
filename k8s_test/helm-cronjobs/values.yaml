@@ -1,0 +1,27 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+batch:
+  - name: echo-1
+    image:
+      repository: ubuntu
+      tag: latest
+      pullPolicy: Always
+    schedule: "*/3 * * * *"
+    command: ["/bin/echo"]
+    args:
+      - "`date` - hello from ubuntu"
+    failedJobsHistoryLimit: 1
+    successfulJobsHistoryLimit: 3
+    concurrencyPolicy: Forbid
+  - name: echo-date
+    image:
+      repository: ubuntu
+      tag: latest
+      pullPolicy: Always
+    schedule: "*/2 * * * *"
+    command: ["/bin/echo"]
+    args:
+      - "`date` - 2"
+    failedJobsHistoryLimit: 1
+    successfulJobsHistoryLimit: 3
+    concurrencyPolicy: Forbid

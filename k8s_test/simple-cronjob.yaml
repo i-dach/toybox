@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: pingpong
 spec:
-  schedule: "*/1 * * * *"
+  schedule: "*/5 * * * *"
   jobTemplate:
     spec:
       template:
@@ -18,7 +18,7 @@ spec:
             args:
             - "-c"
             - |
-              echo [`date`] ping!
+              echo [ERR]  `date` ping!
               sleep 10
-              echo [`date`] pong!
+              echo [INFO] `date` pong!
           restartPolicy: OnFailure
