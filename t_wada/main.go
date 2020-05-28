@@ -14,8 +14,14 @@ type FizzBuzz struct{}
 
 // Convert is FizzuBuzzの定義がされていたらint -> stringにConvertするよ！
 func (*FizzBuzz) Convert(x int) string {
-	if x == 3 {
+	// 仮実装
+	if x%3 == 0 {
 		return "Fizz"
 	}
+
+	if x%5 == 0 {
+		return "Buzz"
+	}
+
 	return strconv.Itoa(x)
 }
