@@ -7,8 +7,6 @@ Spreadsheetの内容を加工して返す
 ************************************************** */
 
 /* 定数 */
-const SPREAD_SHEET_ID = "xxx"; // スプレッドシートのID
-const spreadsheet = SpreadsheetApp.openById(SPREAD_SHEET_ID);
 const RANGE = "A2:K100";// 取得するのセル範囲
 const KEYS = {
     "date": 0,          // 日付
@@ -70,6 +68,8 @@ const TEMPLATE = {
     },
 }
 
-// API KEYS
+// KEYS
 var scriptProperties = PropertiesService.getScriptProperties();
+
+const spreadsheet = SpreadsheetApp.openById('SPREAD_SHEET_ID');
 const API_KEY = scriptProperties.getProperty('API_KEY');

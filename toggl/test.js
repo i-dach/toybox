@@ -4,6 +4,75 @@
 　ZACへの登録はとりあえず運用でカバー
 ***************************************************************/
 
+const WEBHOOKURL = "xxxx";
+const TOGGL_TOKEN = 'xxxx';
+
+/* 外部APIとの連携用funcitnos *************************************************************/
+// Slackへの挙動を司る定義
+var Slack = {
+  /****
+    func: 引数で受け取った情報をSlackへ投稿する
+ 
+    @param: 
+     info -> Toggl APIから取得したユーザー情報
+     mess -> 投稿テキスト(タスク一覧文字列)
+
+    @return: 
+     res -> Slackからのリクエスト成否
+  ****/
+  post: function(payload){
+    var options = {
+      'method': 'POST',
+      'contentType': 'application/json',
+      'payload': JSON.stringify(payload)
+    }
+
+    var res = UrlFetchApp.fetch(WEBHOOKURL, options);
+    return res;
+  },
+}
+
+// Toggl APIにアクセスするための各種エンドポイント
+var Toggl = {
+  BASIC_AUTH: TOGGL_TOKEN + ':api_token',
+  URL: 'https://www.toggl.com/api/v8',
+
+  request: function(path, options){
+    var url = this.URL + path;
+    var response = UrlFetchApp.fetch(url, options);
+
+    return JSON.parse(response);
+  },
+  post: function(path){
+    var options = {
+      'method' : 'post',
+      'headers': {"Authorization" : "Basic " + Utilities.base64Encode(this.BASIC_AUTH)}
+    }
+    
+    return this.request(path, options);
+  },
+  get: function(path){
+    var options = {
+      'method' : 'get',
+      'headers': {"Authorization" : "Basic " + Utilities.base64Encode(this.BASIC_AUTH)}
+    }
+
+    return this.request(path, options);
+  },
+  Sessions: function(){
+    var path = '/sessions';
+    return this.post(path)
+  },
+  Users: function(){
+    var path = '/me?with_related_data=true';
+    return this.get(path)
+  },
+  Project: function(id) {
+    var path = '/projects/' + id
+    return this.get(path);
+  },
+}
+
 /* 加工用funcitnos *************************************************************/
 var ToggltoSlack = {
   StandardDate: function(){
@@ -73,7 +142,7 @@ var ToggltoSlack = {
     for(let i=0; i< entries.length; i++) {    
       // タスクの実行日を取得して整形する
       var start_date = ToggltoSlack.GetTaskDate(entries[i]);
-      start_date = new Date(start_date[0], start_date[1] - 1, start_date[2]);
+      start_date = new Date(start_date[0], start_date[1] - 3, start_date[2]);
       var work_date = this.FmtConvert(start_date, 'YYYY/MM/DD');
 
       if(work_date === standard) {
@@ -90,9 +159,8 @@ var ToggltoSlack = {
     for(let i=0; i< work.length; i++) {
         if(work[i].pid in res){
             res[work[i].pid].duration += work[i].duration;
-//            if(! work[i].description in res[work[i].pid].description){
-            if(! res[work[i].pid].description.includes(' - ' +work[i].description) ){
-              res[work[i].pid].description.push(' - ' +work[i].description);
+            if(! work[i].description in res[work[i].pid].description){
+              res[work[i].pid].description.push(work[i].description);
             }
             continue;
         } 
@@ -100,7 +168,7 @@ var ToggltoSlack = {
         res[work[i].pid] = {};
         res[work[i].pid].duration = work[i].duration;
         res[work[i].pid].description = [];
-        res[work[i].pid].description.push(' - ' +work[i].description);
+        res[work[i].pid].description.push(' - '+work[i].description);
     }
 
     return res;
@@ -129,16 +197,18 @@ function handler() {
     }
 
     // 昨日のタスクだけpush（投稿イメージ：【プロジェクト名】タスク名　40分）
-    data.push('▽' + prj + '  ' + ToggltoSlack.GetTaskDuration(work_list[key]) + '\n' + ToggltoSlack.GetTaskName(work_list[key]).join('\n')+ '\n');
+    data.push('▽' + prj + '  ' + ToggltoSlack.GetTaskDuration(work_list[key]) + '\n' + ToggltoSlack.GetTaskName(work_list[key]).join('\n - ')+ '\n');
     
   } 
     // Slackへ送信用
     var payload = {
         text: data.join('\n'),
     }
-    console.log(payload.text);
+    console.log(payload);
+
+    alert(payload);
   
-    Slack.post(payload);
+ //   Slack.post(payload);
 }
 
 /*main *************************************************************/
@@ -150,9 +220,4 @@ function main(){
   if ( 1 < day && day < 7 ) {
       handler();
   }
-}
-
-// testページからの実行
-function test(){
-  handler();
 }
